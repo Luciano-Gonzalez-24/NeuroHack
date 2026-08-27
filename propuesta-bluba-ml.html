@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bluba — Seguimiento diario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #EFF3EF;
+    --paper-raised: #FBFCFA;
+    --ink: #202824;
+    --ink-soft: #4B564F;
+    --sage: #4F7A64;
+    --sage-deep: #395A48;
+    --sage-tint: #D7E4DA;
+    --teal: #2C4A52;
+    --amber: #C98A3D;
+    --amber-tint: #F1E1C8;
+    --line: rgba(32,40,36,0.12);
+    --maxw: 880px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:inherit; }
+
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 28px; }
+  @media (max-width:640px){ .wrap{ padding:0 20px; } }
+
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    margin:0;
+    color:var(--ink);
+  }
+
+  :focus-visible{
+    outline:2.5px solid var(--sage-deep);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:20;
+    background:rgba(239,243,239,0.9);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px;
+    max-width:var(--maxw); margin:0 auto;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Fraunces', serif; font-weight:600;
+    font-size:16px;
+  }
+  .brand-mark{
+    width:24px; height:24px; border-radius:7px;
+    background:linear-gradient(155deg, var(--sage) 0%, var(--teal) 100%);
+    flex:none;
+  }
+  nav.links{ display:flex; gap:22px; font-size:13.5px; }
+  nav.links a{ text-decoration:none; color:var(--ink-soft); }
+  nav.links a:hover{ color:var(--sage-deep); }
+  @media (max-width:640px){ nav.links{ display:none; } }
+
+  /* ---------- Intro ---------- */
+  .intro{ padding:56px 0 8px; }
+  .intro h1{ font-size:clamp(26px, 3.6vw, 34px); }
+  .intro p{ margin-top:12px; color:var(--ink-soft); font-size:15.5px; max-width:52ch; }
+
+  /* ---------- Sections ---------- */
+  section{ padding:48px 0; }
+  .section-head{ margin-bottom:28px; }
+  .section-head h2{ font-size:clamp(20px, 2.6vw, 24px); }
+  .section-head p{ color:var(--ink-soft); margin-top:8px; font-size:14.5px; max-width:60ch; }
+
+  /* ---------- Panel / form ---------- */
+  .panel{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:32px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:36px;
+  }
+  .panel.single{ grid-template-columns:1fr; max-width:560px; }
+  @media (max-width:860px){ .panel{ grid-template-columns:1fr; padding:22px; } }
+
+  .panel h3{
+    font-family:'Inter', sans-serif; font-weight:600; font-size:13px;
+    text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft);
+    margin:0 0 16px;
+  }
+
+  #crisis-form{ display:grid; gap:16px; }
+  .field{ display:grid; gap:6px; }
+  .field label{ font-size:13px; font-weight:500; color:var(--ink); }
+  .field-hint{ font-size:12px; color:var(--ink-soft); font-weight:400; }
+  .field select, .field input, .field textarea{
+    font-family:'Inter', sans-serif; font-size:14px; color:var(--ink);
+    background:#fff; border:1px solid var(--line); border-radius:9px;
+    padding:10px 12px; width:100%;
+  }
+  .field textarea{ resize:vertical; min-height:64px; }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:480px){ .field-row{ grid-template-columns:1fr; } }
+
+  .btn-predict{
+    margin-top:2px;
+    font-size:14px; font-weight:500;
+    background:var(--sage-deep); color:#fff;
+    border:none; border-radius:100px;
+    padding:12px 22px;
+    cursor:pointer;
+    display:inline-flex; align-items:center; gap:10px;
+    justify-content:center;
+    transition:background 0.15s ease;
+  }
+  .btn-predict:hover{ background:var(--sage); }
+  .btn-predict:disabled{ background:var(--ink-soft); cursor:progress; opacity:0.75; }
+
+  .spinner{
+    width:13px; height:13px; border-radius:50%;
+    border:2px solid rgba(255,255,255,0.4);
+    border-top-color:#fff;
+    animation:spin 0.7s linear infinite;
+    display:none;
+  }
+  .btn-predict[data-loading="true"] .spinner{ display:inline-block; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .result-empty{
+    display:flex; flex-direction:column; align-items:flex-start; justify-content:center;
+    min-height:160px; color:var(--ink-soft); font-size:14px; gap:8px;
+    border:1px dashed var(--line); border-radius:14px; padding:26px;
+  }
+
+  .result-card{ display:none; }
+  .result-card.visible{ display:block; }
+
+  .risk-head{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .risk-badge{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:500;
+    padding:6px 13px; border-radius:100px; letter-spacing:0.02em;
+  }
+  .risk-badge.bajo{ background:var(--sage-tint); color:var(--sage-deep); }
+  .risk-badge.medio{ background:var(--amber-tint); color:#8A5A20; }
+  .risk-badge.alto{ background:#F0D3CB; color:#9B3E24; }
+
+  .risk-prob{ font-family:'Fraunces', serif; font-weight:600; font-size:26px; color:var(--ink); }
+  .risk-prob span{ font-size:14px; color:var(--ink-soft); font-family:'Inter', sans-serif; }
+
+  .confidence-bar{
+    margin-top:16px; height:6px; border-radius:100px; background:var(--sage-tint); overflow:hidden;
+  }
+  .confidence-bar > div{ height:100%; background:var(--teal); border-radius:100px; }
+  .confidence-label{ font-size:12px; color:var(--ink-soft); margin-top:6px; }
+
+  .result-block{ margin-top:22px; }
+  .result-block h4{ font-size:13px; font-weight:600; margin:0 0 10px; color:var(--ink); }
+  .factor-list, .action-list{ margin:0; padding:0; list-style:none; display:grid; gap:9px; }
+  .factor-list li{ font-size:13.5px; color:var(--ink-soft); padding-left:16px; position:relative; }
+  .factor-list li::before{ content:"—"; position:absolute; left:0; color:var(--teal); }
+  .action-list li{
+    font-size:13.5px; background:var(--sage-tint);
+    border-radius:9px; padding:9px 12px; color:var(--sage-deep);
+  }
+  .completeness-note{
+    margin-top:18px; font-size:12.5px; color:var(--amber); background:var(--amber-tint);
+    border-radius:9px; padding:9px 12px; display:none;
+  }
+  .completeness-note.visible{ display:block; }
+
+  .demo-error{
+    margin-top:14px; font-size:13px; color:#9B3E24; background:#F0D3CB;
+    border-radius:9px; padding:10px 12px; display:none;
+  }
+  .demo-error.visible{ display:block; }
+
+  .fine-print{ font-size:12px; color:var(--ink-soft); margin-top:16px; line-height:1.5; }
+
+  .status-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:7px 12px;
+    border:1px solid var(--line);
+    border-radius:100px;
+    background:var(--paper-raised);
+    color:var(--ink-soft);
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:36px 0;
+    margin-top:20px;
+  }
+  footer .wrap{
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:10px;
+    font-size:13px; color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <nav class="links">
+      <a href="#registro">Registro diario</a>
+      <a href="#confirmar">Confirmar resultado</a>
+      <a href="#juguete">Juguete</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="wrap intro">
+    <h1>Seguimiento diario</h1>
+    <p>Registra cómo estuvo hoy tu hijo o hija y recibe una estimación del riesgo de una crisis conductual en las próximas 24 horas, junto con estrategias concretas para este momento.</p>
+  </div>
+
+  <!-- ============ REGISTRO DIARIO ============ -->
+  <section id="registro">
+    <div class="wrap">
+      <div class="panel">
+        <div>
+          <h3>Registro de hoy</h3>
+          <form id="crisis-form">
+            <div class="field">
+              <label for="usuario_id">Niño / niña</label>
+              <select id="usuario_id" name="usuario_id">
+                <option value="familia_demo_01" selected>Perfil de prueba 1</option>
+                <option value="familia_demo_02">Perfil de prueba 2</option>
+                <option value="familia_demo_03">Perfil de prueba 3</option>
+                <option value="PAC-001">Caso piloto A</option>
+                <option value="PAC-002">Caso piloto B</option>
+                <option value="PAC-003">Caso piloto C</option>
+                <option value="PAC-004">Caso piloto D</option>
+              </select>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="horas_sueno">Horas de sueño anoche</label>
+                <input type="number" id="horas_sueno" name="horas_sueno" min="0" max="14" step="0.5" placeholder="ej. 6.5">
+              </div>
+              <div class="field">
+                <label for="calidad_sueno">Calidad del sueño anoche</label>
+                <select id="calidad_sueno" name="calidad_sueno">
+                  <option value="">Sin datos</option>
+                  <option value="3" selected>Buena</option>
+                  <option value="2">Regular</option>
+                  <option value="1">Mala / muy interrumpida</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="estado_basal">Estado de ánimo hoy</label>
+                <select id="estado_basal" name="estado_basal">
+                  <option value="">Sin datos</option>
+                  <option value="3" selected>Tranquilo</option>
+                  <option value="2">Neutro</option>
+                  <option value="1">Irritable</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="nivel_apoyo">Nivel de apoyo disponible hoy</label>
+                <select id="nivel_apoyo" name="nivel_apoyo">
+                  <option value="">Sin datos</option>
+                  <option value="1" selected>Alto</option>
+                  <option value="2">Medio</option>
+                  <option value="3">Bajo</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="salud_gi">Malestar gastrointestinal</label>
+                <select id="salud_gi" name="salud_gi">
+                  <option value="">Sin datos</option>
+                  <option value="1" selected>Normal</option>
+                  <option value="2">Molestia leve</option>
+                  <option value="3">Severo</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="cambio_rutina">Cambio de rutina hoy</label>
+                <select id="cambio_rutina" name="cambio_rutina">
+                  <option value="">Sin datos</option>
+                  <option value="0" selected>Ninguno</option>
+                  <option value="1">Leve</option>
+                  <option value="2">Drástico</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="desregulaciones_previas">Desregulaciones en los últimos 3 días</label>
+              <input type="number" id="desregulaciones_previas" name="desregulaciones_previas" min="0" max="5" step="1" placeholder="ej. 0">
+              <span class="field-hint">Cuántas veces se desreguló en los últimos 3 días, no solo hoy.</span>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="alimentacion">Alimentación hoy</label>
+                <select id="alimentacion" name="alimentacion">
+                  <option value="">Sin datos</option>
+                  <option value="1" selected>Normal</option>
+                  <option value="2">Poco apetito</option>
+                  <option value="3">Rechazo total</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="interaccion_social">Interacción social</label>
+                <select id="interaccion_social" name="interaccion_social">
+                  <option value="">Sin datos</option>
+                  <option value="1" selected>Positiva</option>
+                  <option value="2">Neutra</option>
+                  <option value="3">Evitativa</option>
+                  <option value="4">Conflictiva</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="notas">Notas (opcional)</label>
+              <textarea id="notas" name="notas" placeholder="Ej: hubo un cambio de terapeuta esta semana, viene de un feriado largo..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-predict" id="predict-btn">
+              <span class="spinner" aria-hidden="true"></span>
+              <span id="predict-btn-label">Guardar y predecir</span>
+            </button>
+          </form>
+        </div>
+
+        <div>
+          <h3>Predicción</h3>
+          <div id="result-empty" class="result-empty">
+            <span>Aún no hay predicción.</span>
+            <span>Completa el registro y presiona «Guardar y predecir» para ver el nivel de riesgo, sus factores y estrategias sugeridas.</span>
+          </div>
+
+          <div id="result-card" class="result-card" aria-live="polite">
+            <div class="risk-head">
+              <span id="risk-badge" class="risk-badge bajo">Riesgo bajo</span>
+              <div class="risk-prob"><span id="risk-prob-value">—</span><span> probabilidad en 24 h</span></div>
+            </div>
+
+            <div class="confidence-bar"><div id="confidence-fill" style="width:0%"></div></div>
+            <div class="confidence-label" id="confidence-label">Confianza: —</div>
+
+            <div class="result-block">
+              <h4>Factores que más influyen</h4>
+              <ul class="factor-list" id="factor-list"></ul>
+            </div>
+
+            <div class="result-block">
+              <h4>Estrategias sugeridas</h4>
+              <ul class="action-list" id="action-list"></ul>
+            </div>
+
+            <div class="result-block" id="bloque-conocido" style="display:none;">
+              <h4>Lo que ya sabemos de este niño/a</h4>
+              <div id="conocido-perfil" style="font-size:13.5px;color:var(--ink-soft);margin-bottom:10px;"></div>
+              <ul class="factor-list" id="conocido-eventos"></ul>
+              <div style="font-size:13px;font-weight:600;margin-top:14px;">Estrategias que le han funcionado antes</div>
+              <ul class="action-list" id="conocido-estrategias" style="margin-top:8px;"></ul>
+            </div>
+
+            <div class="completeness-note" id="completeness-note"></div>
+          </div>
+
+          <div class="demo-error" id="demo-error"></div>
+
+          <div class="result-block" style="margin-top:26px;border-top:1px solid var(--line);padding-top:20px;">
+            <h4>Agregar un detonante conocido</h4>
+            <p style="font-size:12.5px;color:var(--ink-soft);margin:4px 0 14px;">
+              Se guarda para <code id="detonante-usuario-actual">Perfil de prueba 1</code> y
+              queda disponible la próxima vez que se prediga para él/ella.
+            </p>
+            <form id="form-detonante" style="display:grid;gap:12px;">
+              <div class="field-row">
+                <div class="field">
+                  <label for="det-tipo">Tipo de evento</label>
+                  <select id="det-tipo" name="tipo_evento">
+                    <option value="Sobrecarga Sensorial">Sobrecarga Sensorial</option>
+                    <option value="Transición de Actividad">Transición de Actividad</option>
+                    <option value="Desregulación Emocional">Desregulación Emocional</option>
+                    <option value="Alimentación">Alimentación</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="det-intensidad">Intensidad</label>
+                  <select id="det-intensidad" name="intensidad">
+                    <option value="Leve (1-3)">Leve (1-3)</option>
+                    <option value="Moderada (4-7)" selected>Moderada (4-7)</option>
+                    <option value="Severa (8-10)">Severa (8-10)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="det-detonante">Detonante observado</label>
+                <input type="text" id="det-detonante" name="detonante" placeholder="Ej: ruido fuerte de licuadora en la cocina">
+              </div>
+
+              <div class="field">
+                <label for="det-estrategia">Estrategia usada</label>
+                <input type="text" id="det-estrategia" name="estrategia" placeholder="Ej: audífonos con cancelación de ruido">
+              </div>
+
+              <div class="field">
+                <label for="det-resultado">Resultado</label>
+                <select id="det-resultado" name="resultado">
+                  <option value="Regulación Exitosa">Reguló bien</option>
+                  <option value="Regulación Parcial">Reguló parcialmente</option>
+                  <option value="Sin éxito">No funcionó</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn-predict" id="btn-detonante" style="justify-self:start;">
+                <span class="spinner" aria-hidden="true"></span>
+                <span id="btn-detonante-label">Agregar detonante</span>
+              </button>
+              <div class="demo-error" id="detonante-error"></div>
+              <div class="completeness-note" id="detonante-exito"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONFIRMAR RESULTADO ============ -->
+  <section id="confirmar">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>¿Qué pasó realmente ese día?</h2>
+        <p>Confirmar el resultado real ayuda a que las próximas predicciones sean más precisas para tu hijo o hija.</p>
+      </div>
+
+      <div class="panel single">
+        <div>
+          <form id="form-confirmar" style="display:grid;gap:14px;">
+            <div class="field-row">
+              <div class="field">
+                <label for="conf-usuario">Niño / niña</label>
+                <select id="conf-usuario" name="usuario_id">
+                  <option value="familia_demo_01" selected>Perfil de prueba 1</option>
+                  <option value="familia_demo_02">Perfil de prueba 2</option>
+                  <option value="familia_demo_03">Perfil de prueba 3</option>
+                  <option value="PAC-001">Caso piloto A</option>
+                  <option value="PAC-002">Caso piloto B</option>
+                  <option value="PAC-003">Caso piloto C</option>
+                  <option value="PAC-004">Caso piloto D</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="conf-fecha">Fecha del registro a confirmar</label>
+                <input type="date" id="conf-fecha" name="fecha">
+              </div>
+            </div>
+
+            <div class="field">
+              <label>¿Hubo una crisis/desregulación ese día?</label>
+              <div style="display:flex;gap:10px;margin-top:6px;">
+                <label style="display:flex;align-items:center;gap:6px;font-weight:400;font-size:14px;">
+                  <input type="radio" name="hubo_crisis" value="si"> Sí
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;font-weight:400;font-size:14px;">
+                  <input type="radio" name="hubo_crisis" value="no" checked> No
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-predict" id="btn-confirmar" style="justify-self:start;">
+              <span class="spinner" aria-hidden="true"></span>
+              <span id="btn-confirmar-label">Confirmar resultado</span>
+            </button>
+            <div class="demo-error" id="confirmar-error"></div>
+            <div class="completeness-note" id="confirmar-exito"></div>
+            <div class="fine-print">Solo puedes confirmar un día que ya hayas registrado antes.</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ JUGUETE ============ -->
+  <section id="juguete">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Alertas en tiempo real del dado</h2>
+        <p>Conecta el dado sensorial (joystick y botón) para ver alertas de movimiento o presión brusca apenas ocurren.</p>
+      </div>
+
+      <div class="panel single">
+        <div>
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <button id="btn-conectar-juguete" class="btn-predict" type="button">
+              <span class="spinner" aria-hidden="true"></span>
+              <span id="btn-conectar-label">Conectar juguete</span>
+            </button>
+            <span id="estado-juguete" class="status-chip">Sin conectar</span>
+          </div>
+
+          <div id="banner-alerta" class="completeness-note" style="margin-top:20px;"></div>
+
+          <div class="result-block">
+            <h4>Últimas alertas</h4>
+            <ul class="factor-list" id="lista-alertas"><li style="color:var(--ink-soft);">Aún no hay alertas.</li></ul>
+          </div>
+
+          <div class="fine-print" id="soporte-navegador"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  // Backend Flask local (ver /backend en el proyecto: app.py, modelo.py, seed_dataset.py).
+  // Cambia este valor si despliegas la API en otra URL.
+  const API_BASE_URL = 'http://localhost:5000';
+
+  const form = document.getElementById('crisis-form');
+  const btn = document.getElementById('predict-btn');
+  const btnLabel = document.getElementById('predict-btn-label');
+  const resultEmpty = document.getElementById('result-empty');
+  const resultCard = document.getElementById('result-card');
+  const errorBox = document.getElementById('demo-error');
+
+  const riskBadge = document.getElementById('risk-badge');
+  const probValue = document.getElementById('risk-prob-value');
+  const confFill = document.getElementById('confidence-fill');
+  const confLabel = document.getElementById('confidence-label');
+  const factorList = document.getElementById('factor-list');
+  const actionList = document.getElementById('action-list');
+  const completenessNote = document.getElementById('completeness-note');
+  const bloqueConocido = document.getElementById('bloque-conocido');
+  const conocidoPerfil = document.getElementById('conocido-perfil');
+  const conocidoEventos = document.getElementById('conocido-eventos');
+  const conocidoEstrategias = document.getElementById('conocido-estrategias');
+
+  const RISK_LABEL = { bajo: 'Riesgo bajo', medio: 'Riesgo medio', alto: 'Riesgo alto' };
+
+  // Campos numéricos que el modelo consume; "" (sin datos) se envía como null
+  // y el backend lo imputa con MICE (ver modelo.py).
+  const CAMPOS_MODELO = ['horas_sueno','calidad_sueno','estado_basal','nivel_apoyo','salud_gi','cambio_rutina','desregulaciones_previas'];
+  const CAMPOS_EXTRA = ['alimentacion','interaccion_social'];
+
+  function buildPayload(formData){
+    const payload = { usuario_id: formData.get('usuario_id') || 'anonimo' };
+
+    CAMPOS_MODELO.concat(CAMPOS_EXTRA).forEach(campo => {
+      const valor = formData.get(campo);
+      payload[campo] = (valor === '' || valor === null) ? null : Number(valor);
+    });
+
+    payload.notas = formData.get('notas') || '';
+    return payload;
+  }
+
+  async function getPrediction(payload){
+    const response = await fetch(`${API_BASE_URL}/api/prediccion`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if(!response.ok){
+      throw new Error('Ocurrió un problema al procesar tu registro.');
+    }
+
+    const result = await response.json();
+    if(!result.risk_level || typeof result.probability !== 'number'){
+      throw new Error('Ocurrió un problema al procesar tu registro.');
+    }
+    return result;
+  }
+
+  function render(result){
+    const level = ['bajo','medio','alto'].includes(result.risk_level) ? result.risk_level : 'medio';
+    riskBadge.className = 'risk-badge ' + level;
+    riskBadge.textContent = RISK_LABEL[level];
+    probValue.textContent = Math.round(result.probability) + '%';
+
+    const confidence = Math.max(0, Math.min(100, Math.round(result.confidence)));
+    confFill.style.width = confidence + '%';
+    confLabel.textContent = 'Confianza del modelo: ' + confidence + '%';
+
+    factorList.innerHTML = '';
+    (result.factors || []).forEach(f => {
+      const li = document.createElement('li');
+      li.textContent = f;
+      factorList.appendChild(li);
+    });
+
+    actionList.innerHTML = '';
+    (result.actions || []).forEach(a => {
+      const li = document.createElement('li');
+      li.textContent = a;
+      actionList.appendChild(li);
+    });
+
+    if(result.completeness_note){
+      completenessNote.textContent = result.completeness_note;
+      completenessNote.classList.add('visible');
+    } else {
+      completenessNote.classList.remove('visible');
+    }
+
+    const conocido = result.known_profile;
+    renderConocido(conocido);
+
+    resultEmpty.style.display = 'none';
+    resultCard.classList.add('visible');
+  }
+
+  function renderConocido(conocido){
+    if(conocido && (conocido.eventos || []).length){
+      const partes = [];
+      if(conocido.diagnostico) partes.push(conocido.diagnostico);
+      if(conocido.perfil_sensorial) partes.push('Perfil sensorial: ' + conocido.perfil_sensorial);
+      conocidoPerfil.textContent = partes.join(' · ');
+
+      conocidoEventos.innerHTML = '';
+      conocido.eventos.forEach(ev => {
+        const li = document.createElement('li');
+        li.textContent = `[${ev.fecha}] ${ev.tipo_evento} (${ev.intensidad}) — detonante: ${ev.detonante}`;
+        conocidoEventos.appendChild(li);
+      });
+
+      conocidoEstrategias.innerHTML = '';
+      (conocido.estrategias_efectivas || []).forEach(estr => {
+        const li = document.createElement('li');
+        li.textContent = estr;
+        conocidoEstrategias.appendChild(li);
+      });
+
+      bloqueConocido.style.display = 'block';
+    } else {
+      bloqueConocido.style.display = 'none';
+    }
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    errorBox.classList.remove('visible');
+    errorBox.textContent = '';
+
+    const payload = buildPayload(new FormData(form));
+
+    btn.disabled = true;
+    btn.setAttribute('data-loading', 'true');
+    btnLabel.textContent = 'Guardando y calculando…';
+
+    try {
+      const result = await getPrediction(payload);
+      render(result);
+    } catch (err) {
+      console.error('Prediction error:', err);
+      errorBox.textContent = 'No pudimos guardar tu registro en este momento. Intenta nuevamente en unos segundos.';
+      errorBox.classList.add('visible');
+    } finally {
+      btn.disabled = false;
+      btn.removeAttribute('data-loading');
+      btnLabel.textContent = 'Guardar registro y predecir';
+    }
+  });
+
+  // --- Agregar un nuevo detonante conocido (para cualquier usuario_id) ---
+  const usuarioSelect = document.getElementById('usuario_id');
+  const detonanteUsuarioActual = document.getElementById('detonante-usuario-actual');
+  const formDetonante = document.getElementById('form-detonante');
+  const btnDetonante = document.getElementById('btn-detonante');
+  const btnDetonanteLabel = document.getElementById('btn-detonante-label');
+  const detonanteError = document.getElementById('detonante-error');
+  const detonanteExito = document.getElementById('detonante-exito');
+
+  function actualizarUsuarioActual(){
+    detonanteUsuarioActual.textContent = usuarioSelect.options[usuarioSelect.selectedIndex].text;
+  }
+  usuarioSelect.addEventListener('change', actualizarUsuarioActual);
+  actualizarUsuarioActual();
+
+  formDetonante.addEventListener('submit', async function(e){
+    e.preventDefault();
+    detonanteError.classList.remove('visible');
+    detonanteExito.classList.remove('visible');
+
+    const datos = new FormData(formDetonante);
+    const usuarioId = usuarioSelect.value;
+    const payload = {
+      tipo_evento: datos.get('tipo_evento'),
+      intensidad: datos.get('intensidad'),
+      detonante: (datos.get('detonante') || '').trim(),
+      estrategia: (datos.get('estrategia') || '').trim(),
+      resultado: datos.get('resultado'),
+    };
+
+    if(!payload.detonante || !payload.estrategia){
+      detonanteError.textContent = 'Completa al menos el detonante y la estrategia usada.';
+      detonanteError.classList.add('visible');
+      return;
+    }
+
+    btnDetonante.disabled = true;
+    btnDetonante.setAttribute('data-loading', 'true');
+    btnDetonanteLabel.textContent = 'Guardando…';
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/detonantes/${encodeURIComponent(usuarioId)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if(!response.ok){
+        const cuerpo = await response.json().catch(() => ({}));
+        throw new Error(cuerpo.error || 'Ocurrió un problema al procesar la solicitud.');
+      }
+      const perfilActualizado = await response.json();
+
+      renderConocido(perfilActualizado);
+      resultEmpty.style.display = 'none';
+      resultCard.classList.add('visible');
+
+      const usuarioLabel = usuarioSelect.options[usuarioSelect.selectedIndex].text;
+      detonanteExito.textContent = `Guardado para ${usuarioLabel}. Ya aparece en "Lo que ya sabemos de este niño/a".`;
+      detonanteExito.classList.add('visible');
+      formDetonante.reset();
+    } catch (err) {
+      console.error('Error guardando detonante:', err);
+      detonanteError.textContent = 'No pudimos guardar este detonante. Intenta nuevamente.';
+      detonanteError.classList.add('visible');
+    } finally {
+      btnDetonante.disabled = false;
+      btnDetonante.removeAttribute('data-loading');
+      btnDetonanteLabel.textContent = 'Agregar detonante';
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  // Lee directo del Arduino por Web Serial (Chrome/Edge de escritorio) —
+  // no usa el backend Flask ni el bridge Bluetooth. Funciona con el
+  // firmware ORIGINAL (umbral fijo), sin ninguna calibración.
+  // Requisitos: Chrome o Edge de escritorio, y abrir esta página como
+  // http://localhost:... o file:// (si falla, sirve la carpeta con
+  // "python -m http.server" y abre http://localhost:8000/).
+  const btn = document.getElementById('btn-conectar-juguete');
+  const btnLabel = document.getElementById('btn-conectar-label');
+  const estado = document.getElementById('estado-juguete');
+  const banner = document.getElementById('banner-alerta');
+  const lista = document.getElementById('lista-alertas');
+  const soporte = document.getElementById('soporte-navegador');
+
+  let port = null;
+  let reader = null;
+  let conectado = false;
+  let bannerTimeout = null;
+
+  if (!('serial' in navigator)) {
+    soporte.textContent = 'Tu navegador no soporta Web Serial (usa Chrome o Edge de escritorio; no funciona en Firefox, Safari ni en el celular).';
+    btn.disabled = true;
+  } else {
+    soporte.textContent = 'Empareja el HC-06 en tu sistema operativo primero (Bluetooth → agregar dispositivo); luego este botón te dejará elegir ese puerto.';
+  }
+
+  function mostrarAlerta(tipo, textoOriginal){
+    const hora = new Date().toLocaleTimeString();
+    banner.textContent = (tipo === 'movimiento' ? '⚠️ Movimiento brusco detectado' : '⚠️ Clic muy rápido detectado') + ' — ' + hora;
+    banner.classList.add('visible');
+    clearTimeout(bannerTimeout);
+    bannerTimeout = setTimeout(() => banner.classList.remove('visible'), 4000);
+
+    if (lista.children.length === 1 && lista.children[0].textContent === 'Aún no hay alertas.') {
+      lista.innerHTML = '';
+    }
+    const li = document.createElement('li');
+    li.textContent = `[${hora}] ${textoOriginal}`;
+    lista.prepend(li);
+    while (lista.children.length > 20) lista.removeChild(lista.lastChild);
+  }
+
+  function procesarLinea(linea){
+    linea = linea.trim();
+    if (!linea) return;
+    // Coincide exactamente con los mensajes del sketch original.
+    if (linea.includes('Pulsación de botón muy rápida')) {
+      mostrarAlerta('clic', linea);
+    } else if (linea.includes('Movimiento brusco')) {
+      mostrarAlerta('movimiento', linea);
+    }
+    // Otras líneas (ej. "Bluetooth conectado y listo.") se ignoran.
+  }
+
+  async function leerPuerto(){
+    const decoder = new TextDecoderStream();
+    port.readable.pipeTo(decoder.writable).catch(() => {});
+    reader = decoder.readable.getReader();
+
+    let buffer = '';
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += value;
+        let idx;
+        while ((idx = buffer.indexOf('\n')) >= 0) {
+          procesarLinea(buffer.slice(0, idx));
+          buffer = buffer.slice(idx + 1);
+        }
+      }
+    } catch (err) {
+      console.error('[juguete] Error leyendo el puerto:', err);
+    } finally {
+      try { reader.releaseLock(); } catch (e) {}
+    }
+  }
+
+  async function conectar(){
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      conectado = true;
+      estado.textContent = 'Conectado';
+      btnLabel.textContent = 'Desconectar';
+      leerPuerto();
+    } catch (err) {
+      console.error('[juguete] No se pudo conectar:', err);
+      estado.textContent = 'No se pudo conectar (revisa el emparejamiento Bluetooth o el cable USB)';
+    }
+  }
+
+  async function desconectar(){
+    try {
+      if (reader) await reader.cancel();
+      if (port) await port.close();
+    } catch (err) {
+      console.error('[juguete] Error al desconectar:', err);
+    }
+    conectado = false;
+    estado.textContent = 'Sin conectar';
+    btnLabel.textContent = 'Conectar juguete';
+  }
+
+  btn.addEventListener('click', () => {
+    if (conectado) desconectar(); else conectar();
+  });
+
+  if ('serial' in navigator) {
+    navigator.serial.addEventListener('disconnect', () => {
+      conectado = false;
+      estado.textContent = 'Desconectado (juguete apagado o fuera de rango)';
+      btnLabel.textContent = 'Conectar juguete';
+    });
+  }
+})();
+</script>
+
+<script>
+(function(){
+  // Mismo backend que la sección "Demo" (ver esa constante para cambiar la URL).
+  const API_BASE_URL = 'http://localhost:5000';
+
+  const form = document.getElementById('form-confirmar');
+  const fechaInput = document.getElementById('conf-fecha');
+  const btn = document.getElementById('btn-confirmar');
+  const btnLabel = document.getElementById('btn-confirmar-label');
+  const errorBox = document.getElementById('confirmar-error');
+  const exitoBox = document.getElementById('confirmar-exito');
+
+  // Por defecto, confirmar el día de hoy (se puede cambiar a cualquier fecha ya registrada).
+  fechaInput.value = new Date().toISOString().slice(0, 10);
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    errorBox.classList.remove('visible');
+    exitoBox.classList.remove('visible');
+
+    const datos = new FormData(form);
+    const payload = {
+      usuario_id: datos.get('usuario_id'),
+      fecha: datos.get('fecha'),
+      hubo_crisis: datos.get('hubo_crisis') === 'si',
+    };
+
+    btn.disabled = true;
+    btn.setAttribute('data-loading', 'true');
+    btnLabel.textContent = 'Confirmando…';
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/confirmar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const cuerpo = await response.json();
+
+      if(!response.ok){
+        throw new Error(cuerpo.error || 'Ocurrió un problema al procesar la solicitud.');
+      }
+
+      exitoBox.textContent = `Confirmado: ${payload.usuario_id} el ${payload.fecha} → ` +
+        (payload.hubo_crisis ? 'SÍ hubo crisis.' : 'No hubo crisis.') +
+        ' Este dato real ya se usará la próxima vez que se entrene el modelo.';
+      exitoBox.classList.add('visible');
+    } catch (err) {
+      console.error('Error confirmando resultado:', err);
+      errorBox.textContent = err.message.includes('No hay un registro')
+        ? err.message
+        : 'No pudimos confirmar el resultado en este momento. Intenta nuevamente.';
+      errorBox.classList.add('visible');
+    } finally {
+      btn.disabled = false;
+      btn.removeAttribute('data-loading');
+      btnLabel.textContent = 'Confirmar resultado';
+    }
+  });
+})();
+</script>
+</body>
+</html>

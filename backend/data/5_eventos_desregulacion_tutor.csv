@@ -1,0 +1,8 @@
+﻿id_evento;id_caso;fecha_hora;tipo_evento;intensidad;detonante_gatillante;estrategia_calma_aplicada;resultado_estrategia
+EVT-001;PAC-001;2026-07-03 16:30;Sobrecarga Sensorial;Moderada (4-7);Música fuerte en supermercado y aglomeración de personas.;Salida a espacio abierto y presión constante en hombros con chaleco de peso.;Regulación Exitosa
+EVT-002;PAC-001;2026-07-12 11:15;Transición de Actividad;Leve (1-3);Término del tiempo de pantalla para ir al almuerzo.;Uso de temporizador visual de 5 minutos y aviso previo verbal.;Regulación Exitosa
+EVT-003;PAC-002;2026-07-06 08:45;Desregulación Emocional;Severa (8-10);Corte de luz repentino y ruido de sirena de ambulancia en la calle.;Colocación inmediata de audífonos atenuadores de ruido y refugio en carpa sensorial casera.;Regulación Parcial
+EVT-004;PAC-002;2026-07-18 19:20;Sobrecarga Sensorial;Moderada (4-7);Etiqueta molesta en prenda de vestir nueva.;Cambio de prenda por ropa suave de algodón sin costuras y masaje en espalda.;Regulación Exitosa
+EVT-005;PAC-003;2026-07-10 17:00;Transición de Actividad;Leve (1-3);Cambio en la ruta habitual de regreso del colegio.;Anticipación mediante agenda de fotos en el teléfono.;Regulación Exitosa
+EVT-006;PAC-004;2026-07-08 13:30;Alimentación;Severa (8-10);Presencia de un alimento nuevo (verdura hervida) en su plato.;Retiro del alimento del plato, ofrecer plato dividido y permitir tocar con tenedor sin obligar a comer.;Regulación Parcial
+EVT-007;PAC-004;2026-07-22 14:10;Alimentación;Moderada (4-7);Olor fuerte a pescado cocinado en la cocina.;Ventilación de la zona y traslado temporal del consultante a su habitación con difusor neutro.;Regulación Exitosa
